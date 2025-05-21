@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>{{ subject.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .message-reply {
+            border-left: 2px solid #ccc;
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+        textarea {
+            width: 10%;
+            height: 60px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ subject.title }}</h1>
+    <p>{{ subject.content }}</p>
+
+    <h2>Messages</h2>
+
+    {% macro render_message(msg, level=0) %}
+        <li class="message-reply" style="margin-left: {{ level * 20 }}px;">
+            <strong>{{ msg.author }}</strong> ({{ msg.created_at }}): {{ msg.content|e }}
+
+            {% if user and user.id == msg.user_id %}
+                <form action="{{ url_for('delete_message', message_id=msg.id) }}" method="post" style="display:inline;">
+                    <button type="submit" onclick="return confirm('Supprimer ce message ?');">Supprimer</button>
+                </form>
+                <a href="{{ url_for('edit_message', message_id=msg.id) }}">Modifier</a>
+            {% endif %}
+
+            {% if user %}
+            <form method="post" style="margin-top:5px;">
+                <textarea name="content" placeholder="Répondre à ce message..." required></textarea><br>
+                <input type="hidden" name="parent_id" value="{{ msg.id }}">
+                <button type="submit">Répondre</button>
+            </form>
+            {% endif %}
+
+            {% if msg.replies %}
+                <ul>
+                    {% for reply in msg.replies %}
+                        {{ render_message(reply, level + 1) }}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endmacro %}
+
+    {% if user %}
+    <form method="post">
+        <textarea name="content" placeholder="Écrire un message..." required></textarea><br>
+        <input type="hidden" name="parent_id" value="">
+        <button type="submit">Envoyer</button>
+    </form>
+    {% else %}
+        <p><a href="{{ url_for('login') }}">Connectez-vous</a> pour poster un message.</p>
+    {% endif %}
+
+    <ul>
+    {% for msg in messages if not msg.parent_id %}
+        {{ render_message(msg) }}
+    {% else %}
+        <li>Aucun message pour le moment.</li>
+    {% endfor %}
+    </ul>
+
+    <p><a href="{{ url_for('index') }}">Retour à l'accueil</a></p>
+</body>
+</html>

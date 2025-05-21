@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Mon compte</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Modifier mon compte</h1>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <form method="post">
+        <input type="text" name="username" value="{{ user.username }}" placeholder="Nom d'utilisateur" required><br>
+        <input type="password" name="password" placeholder="Nouveau mot de passe (laisser vide pour ne pas changer)"><br>
+        <button type="submit">Modifier</button>
+    </form>
+    <p><a href="{{ url_for('index') }}">Retour à l'accueil</a></p>
+</body>
+</html>

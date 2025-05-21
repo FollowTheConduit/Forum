@@ -1,0 +1,29 @@
+DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS subjects;
+DROP TABLE IF EXISTS messages;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL
+);
+
+CREATE TABLE subjects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subject_id INTEGER NOT NULL,
+    parent_id INTEGER,
+    user_id INTEGER NOT NULL,
+    author TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY(subject_id) REFERENCES subjects(id),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(parent_id) REFERENCES messages(id)
+);
